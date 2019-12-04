@@ -8,7 +8,7 @@ public:
 	// Renew lại bộ đệm
 	void clean(void);
 
-	// Đọc dữ liệu ảnh BMP 24 bit deepth
+	// Đọc dữ liệu ảnh BMP 24 bit deepth (Nén ảnh BMP sang chuản JPEG)
 	bool readFromBMP(const char* fileName);
 
 	// Mã hóa thành ảnh JPEG
@@ -20,16 +20,16 @@ private:
 	unsigned char*	m_rgbBuffer;	// Mảng chứa toàn bộ điểm ảnh m_width*m_height*3
 	
 	unsigned char	m_YTable[64];	// Chứa độ sáng khi chuyển đổi không gian màu
-	unsigned char	m_CbCrTable[64]; // Chứa độ màu khi chuyển đổi khôn gian màu
+	unsigned char	m_CbCrTable[64]; // Chứa độ màu khi chuyển đổi khôn gian màu bao gồm Cb và Cr
 
-	// Một bitstring khi mã hóa sẽ được lưu dưới dạng 1 cặp giá trị (độ dài bit 0 bỏ qua, giá trị kế tiếp khác 0)
+	// Một bitstring khi mã hóa sẽ được lưu dưới dạng 1 cặp giá trị (độ dài bit biểu diễn giá trị value, giá trị value)
 	struct BitString
 	{
 		int length;	
 		int value;
 	};
 
-	// Mảng trung gian chứa các giá trị mã hóa khởi tạo ban đầu cho cây huffman
+	// Bảng mã code huffman để mã hóa entropy trên DC và ACs
 	BitString m_Y_DC_Huffman_Table[12];
 	BitString m_Y_AC_Huffman_Table[256];
 
@@ -37,36 +37,36 @@ private:
 	BitString m_CbCr_AC_Huffman_Table[256];
 
 private:
-	// Gọi đầu tiên. Khởi tạoc ác giá trị mặc định cho table
-	void _initHuffmanTables(void);
+	// Phương thức khởi tạo các giá trị mặc định cho table
+	void initHuffmanTables(void);
 
-	// Khởi tạo các thay đổi về chất lượng nén ảnh. Tham số càng lớn thì dung lượng ảnh nén càng nhỏ
-	void _initQualityTables(int quality);
+	// Khởi tạo các thay đổi về chất lượng nén ảnh. Tham số càng lớn thì dung lượng ảnh nén càng nhỏ. Đầu vào là một số nguyên từ 1 đến 99.
+	void initQualityTables(int quality);
 
 	// Được gọi khi đã init bảng Table. Khởi tạo ban đầu
-	void _computeHuffmanTable(const char* nr_codes, const unsigned char* std_table, BitString* huffman_table);
+	void computeHuffmanTable(const char* nr_codes, const unsigned char* std_table, BitString* huffman_table);
 
 	// Phương thứuc trả về số lượng bit cần tối thiểu để biểu diễn số nguyên value
-	BitString _getBitCode(int value);
+	BitString getBitCode(int value);
 
 	// Chuyển đổi không gian màu từ RGB sang Y(Độ sáng) Cb Cr (Độ màu)
-	void _convertColorSpace(int xPos, int yPos, char* yData, char* cbData, char* crData);
+	void convertColorSpace(int xPos, int yPos, char* yData, char* cbData, char* crData);
 
 	// biến đổi cosin rời rạc 2 chiều
-	void _foword_FDC(const char* channel_data, short* fdc_data);
+	void foword_FDC(const char* channel_data, short* fdc_data);
 
 	// Mã hóa huffman
-	void _doHuffmanEncoding(const short* DU, short& prevDC, const BitString* HTDC, const BitString* HTAC,  BitString* outputBitString, int& bitStringCounts);
+	void doHuffmanEncoding(const short* DU, short& prevDC, const BitString* HTDC, const BitString* HTAC,  BitString* outputBitString, int& bitStringCounts);
 
 private:
 	// ghi header file JPEG
-	void _write_jpeg_header(FILE* fp);
+	void write_jpeg_header(FILE* fp);
 
 	// Các bién thể của phương thức ghi xuống file
-	void _write_byte_(unsigned char value, FILE* fp); // ghi lần 1 byte
-	void _write_word_(unsigned short value, FILE* fp); // ghi lần 1 word (2 byte)
-	void _write_bitstring_(const BitString* bs, int counts, int& newByte, int& newBytePos, FILE* fp); // ghi lần 1 đối tượng của mảng Bitstring theo số lượng biến count byte
-	void _write_(const void* p, int byteSize, FILE* fp); // hia lần 1 byte nhưng đặc biệt để ghi header file
+	void write_byte(unsigned char value, FILE* fp); // ghi lần 1 byte
+	void write_word(unsigned short value, FILE* fp); // ghi lần 1 word (2 byte)
+	void write_bitstring(const BitString* bs, int counts, int& newByte, int& newBytePos, FILE* fp); // ghi lần 1 đối tượng của mảng Bitstring theo số lượng biến count byte
+	void write(const void* p, int byteSize, FILE* fp); // hia lần 1 byte nhưng đặc biệt để ghi header file
 
 public:
 	// Phương thức tạo và phương thức hủy
