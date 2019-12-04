@@ -308,7 +308,7 @@ bool JpegEncoder::encodeToJPG(const char* fileName, int quality_scale)
 		}
 	}
 
-	write_word(0xFFD9, fp); //Write End of Image Marker   
+	write_word(0xFFD9, fp); // Ghi kí tự kết thúc File
 	
 	fclose(fp);
 
@@ -393,7 +393,7 @@ void JpegEncoder::initQualityTables(int quality_scale)
 	}
 }
 
-// Khởi tạo bảng mã hóa entropy
+// Khởi tạo bảng mã hóa entropy dùng cho Y, Cb, Cr cả Luminance và Chrominance
 void JpegEncoder::computeHuffmanTable(const char* nr_codes, const unsigned char* std_table, BitString* huffman_table)
 {
 	unsigned char pos_in_table = 0;

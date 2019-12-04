@@ -4,6 +4,28 @@
 
 class JpegEncoder
 {
+private:
+	int				m_width;		// Chiều rộng
+	int				m_height;		// Chiều cao
+	unsigned char* m_rgbBuffer;	// Mảng chứa toàn bộ điểm ảnh m_width*m_height*3
+
+	unsigned char	m_YTable[64];	// Chứa độ sáng khi chuyển đổi không gian màu
+	unsigned char	m_CbCrTable[64]; // Chứa độ màu khi chuyển đổi khôn gian màu bao gồm Cb và Cr
+
+	// Một bitstring khi mã hóa sẽ được lưu dưới dạng 1 cặp giá trị (độ dài bit biểu diễn giá trị value, giá trị value)
+	struct BitString
+	{
+		int length;
+		int value;
+	};
+
+	// Bảng mã code huffman để mã hóa entropy trên DC và ACs
+	BitString m_Y_DC_Huffman_Table[12];
+	BitString m_Y_AC_Huffman_Table[256];
+
+	BitString m_CbCr_DC_Huffman_Table[12];
+	BitString m_CbCr_AC_Huffman_Table[256];
+
 public:
 	// Renew lại bộ đệm
 	void clean(void);
@@ -14,27 +36,7 @@ public:
 	// Mã hóa thành ảnh JPEG
 	bool encodeToJPG(const char* fileName, int quality_scale);
 
-private:
-	int				m_width;		// Chiều rộng
-	int				m_height;		// Chiều cao
-	unsigned char*	m_rgbBuffer;	// Mảng chứa toàn bộ điểm ảnh m_width*m_height*3
-	
-	unsigned char	m_YTable[64];	// Chứa độ sáng khi chuyển đổi không gian màu
-	unsigned char	m_CbCrTable[64]; // Chứa độ màu khi chuyển đổi khôn gian màu bao gồm Cb và Cr
 
-	// Một bitstring khi mã hóa sẽ được lưu dưới dạng 1 cặp giá trị (độ dài bit biểu diễn giá trị value, giá trị value)
-	struct BitString
-	{
-		int length;	
-		int value;
-	};
-
-	// Bảng mã code huffman để mã hóa entropy trên DC và ACs
-	BitString m_Y_DC_Huffman_Table[12];
-	BitString m_Y_AC_Huffman_Table[256];
-
-	BitString m_CbCr_DC_Huffman_Table[12];
-	BitString m_CbCr_AC_Huffman_Table[256];
 
 private:
 	// Phương thức khởi tạo các giá trị mặc định cho table
