@@ -6,17 +6,28 @@ using namespace std;
 
 int main()
 {
+	while (1) {
+		system("cls");
 
-	string name;
-	cout << "Enter input file name: ";
-	getline(cin, name);
-	cin.ignore(0);
+		string name;
+		cout << ">> Enter input file name (0: End process ): ";
+		getline(cin, name);
+		cin.ignore(0);
 
-	string out_name = name.substr(0, name.length() - 4) + ".jpeg";
+		if (name.length() == 1 && stoi(name) == 0) {
+			return EXIT_SUCCESS;
+		}
 
-	JpegEncoder encoder;
-	encoder.readFromBMP(name.c_str());
-	encoder.encodeToJPG(out_name.c_str(), 99);
+		string out_name = name.substr(0, name.length() - 4) + ".jpeg";
+
+		JpegEncoder encoder;
+		encoder.readFromBMP(name.c_str());
+		encoder.encodeToJPG(out_name.c_str(), 50);
+
+		cout << "\nDONE !\n\n";
+
+		system("pause");
+	}
 
 	return EXIT_SUCCESS;
 }
